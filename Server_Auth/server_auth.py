@@ -84,10 +84,10 @@ class Existence(Resource):
         token2 = handleEncryptedInput(args['token2'])
 
         token = token1 + token2
-        
+
         result = UserModel.query.filter_by(
             token=token).first()
-        
+
         if result:
             return result.__dict__['username'], 200
 
@@ -126,7 +126,9 @@ class User(Resource):
 
             return {
                     'status': 'Logged in successfully!',
-                    'token': bytes_and_strings.encryptedBytesToString(cipherToken),
+                    'token': bytes_and_strings.encryptedBytesToString(
+                        cipherToken
+                    ),
                     'nonce': bytes_and_strings.encryptedBytesToString(nonce),
                     'tag': bytes_and_strings.encryptedBytesToString(tag)
                     }, 200
@@ -201,14 +203,14 @@ def handleEncryptedInput(message: str) -> str:
 
 def handleEncryptedSymmKey(cipherKey: str) -> bytes:
     encSymmetricKey = bytes_and_strings.encryptedStringToBytes(cipherKey)
-    symmetricKey = encryption_asymmetric.decrypt(encSymmetricKey, encProfile.privateKey)
+    symmetricKey = encryption_asymmetric.\
+        decrypt(encSymmetricKey, encProfile.privateKey)
 
     return symmetricKey
 
 api.add_resource(User, '/accounts')
 api.add_resource(Secure, '/publickey')
 api.add_resource(Existence, '/existence')
-
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ print('\033[32mSuccess!')
 
 # message = 'Some message'
 
-# message_enc = encryption_asymmetric.encrypt(bytes_and_strings.stringToBytes(message), publicKey)
+# message_enc = encryption_asymmetric.\
+# encrypt(bytes_and_strings.stringToBytes(message), publicKey)
 # print(message_enc)
 
 # # message_enc_string = bytes_and_strings.bytesToString(message_enc)

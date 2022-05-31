@@ -1,4 +1,4 @@
-from inspect import _void
+import os
 from unittest.util import _MAX_LENGTH
 from cryptography.hazmat.primitives.asymmetric import rsa, types, padding
 from cryptography.hazmat.primitives import serialization, hashes
@@ -9,6 +9,9 @@ SUPERSECRET = b'sypersecretpassword'
 
 
 def generateKeys(dirPath: str):
+
+    if not os.path.exists(dirPath):
+        os.mkdir(dirPath)
 
     privateKey = rsa.generate_private_key(
         public_exponent=65537,

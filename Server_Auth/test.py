@@ -39,7 +39,8 @@ encSymmetricKey = encryption_asymmetric.encrypt(key, publicKey)
 
 encUsernameString = bytes_and_strings.encryptedBytesToString(encUsername)
 encPasswordString = bytes_and_strings.encryptedBytesToString(encPassword)
-encSymmetricKeyString = bytes_and_strings.encryptedBytesToString(encSymmetricKey)
+encSymmetricKeyString = \
+    bytes_and_strings.encryptedBytesToString(encSymmetricKey)
 
 parametres['username'] = encUsernameString
 parametres['password'] = encPasswordString
@@ -62,12 +63,19 @@ if(response.status_code == 200):
 
         print(f'Your token: {token}')
 
-        encToken1 = encryption_asymmetric.encrypt(bytes_and_strings.stringToBytes(token[:223]), publicKey)
-        encToken2 = encryption_asymmetric.encrypt(bytes_and_strings.stringToBytes(token[223:]), publicKey)
+        encToken1 = encryption_asymmetric.\
+            encrypt(bytes_and_strings.stringToBytes(token[:223]), publicKey)
+        encToken2 = encryption_asymmetric.\
+            encrypt(bytes_and_strings.stringToBytes(token[223:]), publicKey)
         encTokenString1 = bytes_and_strings.encryptedBytesToString(encToken1)
         encTokenString2 = bytes_and_strings.encryptedBytesToString(encToken2)
 
-        response = requests.get(BASE + 'existence', {'token1': encTokenString1, 'token2': encTokenString2}, verify=False)
+        response = requests.get(
+            BASE + 'existence',
+            {'token1': encTokenString1,
+             'token2': encTokenString2},
+            verify=False
+        )
 
         print(response.text[1:len(response.text) - 2])
 

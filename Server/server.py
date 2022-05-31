@@ -33,9 +33,10 @@ SERVER_USERNAME = 'SERVER'
 lock = threading.Lock()
 
 members = []
-names: dict = {}
+names = {}
 encProfile = EncryptingProfile('server_keys')
 closed = False
+
 
 def closeSocket():
     global closed
@@ -51,24 +52,26 @@ def startServer(host: str = '192.168.1.37', port: int = 3030):
     server.bind((host, port))
     try:
         server.listen()
-        
+
         print(f'Listening at {host}:{port}')
 
         threading.Thread(target=closeSocket).start()
 
         while not closed:
             conn, address = server.accept()
-            thread = threading.Thread(target=handleClient, args=(conn, address))
+            thread = threading.Thread(target=handleClient,
+                                      args=(conn, address))
             thread.start()
-            print(f"\033[32m[ACTIVE CONNECTIONS] {threading.activeCount() - 2}\033[37m")
-    
+            print(f"\033[32m[ACTIVE CONNECTIONS]",
+                  f"{threading.activeCount() - 2}\033[37m")
+
     except:
         server.close()
 
 
 def handleClient(conn: socket.socket, address: tuple):
     client = Member(conn, address)
-    
+
     lock.acquire()
     try:
         members.append(client)
@@ -87,7 +90,9 @@ def handleClient(conn: socket.socket, address: tuple):
 def sendPublicKey(client: Member):
     sendPacketStrToClient(client, SYMM_KEY)
     sendPacketStrToClient(client, SERVER_USERNAME)
-    sendPacketStrToClient(client, encryption_asymmetric.getStringOfPublicKey(encProfile.publicKey))
+    sendPacketStrToClient(
+        client,
+        encryption_asymmetric.getStringOfPublicKey(encProfile.publicKey))
 
 
 def handleCommand(client: Member):
@@ -109,7 +114,12 @@ def handleCommand(client: Member):
         routePublicKey(client)
         return
 
-    sendMessageToClient(client, UNKNOWN, SERVER_USERNAME, '!!!Unknown command!!!')
+    sendMessageToClient(
+        client,
+        UNKNOWN,
+        SERVER_USERNAME,
+        '!!!Unknown command!!!'
+    )
 
 
 def onStartChat(client: Member):
@@ -121,12 +131,22 @@ def onStartChat(client: Member):
 
     for member in members:
         if member.userName == reciever:
-            sendMessageToClient(client, START_CHAT, SERVER_USERNAME, 'User found')
+            sendMessageToClient(
+                client,
+                START_CHAT,
+                SERVER_USERNAME,
+                'User found'
+            )
             prepareChat(client, member)
             print(f'Chat {client.userName} - {reciever} started')
             return
-    
-    sendMessageToClient(client, START_CHAT, SERVER_USERNAME, '!!!User not found!!!')
+
+    sendMessageToClient(
+        client,
+        START_CHAT,
+        SERVER_USERNAME,
+        '!!!User not found!!!'
+    )
     return
 
 
@@ -137,8 +157,13 @@ def onSendMessage(client: Member):
             if member.userName == reciever:
                 routeMessage(client, member, SEND_MESSAGE)
                 return
-    
-    sendMessageToClient(client, START_CHAT, SERVER_USERNAME, '!!!User not found!!!')
+
+    sendMessageToClient(
+        client,
+        START_CHAT,
+        SERVER_USERNAME,
+        '!!!User not found!!!'
+    )
     return
 
 
@@ -146,32 +171,46 @@ def authorize(client: Member):
     response = requests.get(AUTH_BASE + 'publickey', verify=False)
 
     publicKeyString = json.loads(response.text)['public key']
-    publicKey = encryption_asymmetric.getBytesOfStringPublicKey(publicKeyString)
-    
+    publicKey = \
+        encryption_asymmetric.getBytesOfStringPublicKey(publicKeyString)
+
     while True:
         recieveMessage(client)
         name = recieveMessage(client)
         token = handleEncryptedMsg(client)
         dividedToken = divideToken(token, publicKey)
 
-        response = requests.get(AUTH_BASE + 'existence', dividedToken, verify=False)
+        response = \
+            requests.get(AUTH_BASE + 'existence', dividedToken, verify=False)
 
         login = response.text[1:len(response.text) - 2]
 
         if name == login:
-            sendMessageToClient(client, LOGIN, SERVER_USERNAME, 'Connected successfully!')
+            sendMessageToClient(
+                client,
+                LOGIN,
+                SERVER_USERNAME,
+                'Connected successfully!'
+            )
             print(f'Successfull sing in for {name}')
             client.userName = name
             for member in members:
                 print(f'{member.userName}, ')
             break
 
-        sendMessageToClient(client, LOGIN, SERVER_USERNAME, '!!!User not found!!!')
+        sendMessageToClient(
+            client,
+            LOGIN,
+            SERVER_USERNAME,
+            '!!!User not found!!!'
+        )
 
 
 def divideToken(token: str, publicKey):
-    encToken1 = encryption_asymmetric.encrypt(bytes_and_strings.stringToBytes(token[:223]), publicKey)
-    encToken2 = encryption_asymmetric.encrypt(bytes_and_strings.stringToBytes(token[223:]), publicKey)
+    encToken1 = encryption_asymmetric.\
+        encrypt(bytes_and_strings.stringToBytes(token[:223]), publicKey)
+    encToken2 = encryption_asymmetric.\
+        encrypt(bytes_and_strings.stringToBytes(token[223:]), publicKey)
 
     encTokenString1 = bytes_and_strings.encryptedBytesToString(encToken1)
     encTokenString2 = bytes_and_strings.encryptedBytesToString(encToken2)
@@ -185,22 +224,28 @@ def handleKeys(client: Member):
     if reciever == SERVER_USERNAME:
         key = recieveMessage(client)
         symm_key = bytes_and_strings.encryptedStringToBytes(key)
-        symm_key = encryption_asymmetric.decrypt(symm_key, encProfile.privateKey)
+        symm_key = encryption_asymmetric.\
+            decrypt(symm_key, encProfile.privateKey)
 
         client.symm_key = symm_key
-    
+
     else:
         for member in members:
             if member.userName == reciever:
                 routeMessage(client, member, SYMM_KEY)
                 return
-    
-        sendMessageToClient(client, SYMM_KEY, SERVER_USERNAME, '!!!User not found!!!')
+
+        sendMessageToClient(
+            client,
+            SYMM_KEY,
+            SERVER_USERNAME,
+            '!!!User not found!!!'
+        )
         return
 
 
 def prepareChat(sender: Member, reciever: Member):
-    sendMessageToClient(reciever, PUBLIC_KEY, sender.userName, message = '')
+    sendMessageToClient(reciever, PUBLIC_KEY, sender.userName, message='')
     routeKey(sender, reciever)
 
 
@@ -225,7 +270,10 @@ def routeKey(sender: Member, reciever: Member):
     sendPacketStrToClient(reciever, key)
 
 
-def sendMessageToClient(client: Member, command: str, header: str, message: str):
+def sendMessageToClient(client: Member,
+                        command: str,
+                        header: str,
+                        message: str):
     nonce, encMessage, tag = encryptMessage(message, client.symm_key)
 
     sendPacketStrToClient(client, command)
@@ -277,7 +325,8 @@ def routeMessage(sender: Member, reciever: Member, command: str):
 def recieveMessage(client: Member) -> str:
     while True:
         msgLength = client.conn.recv(HEADER).decode(FORMAT)
-        if not msgLength: continue
+        if not msgLength:
+            continue
 
         msgLength = int(msgLength)
         message = client.conn.recv(msgLength).decode(FORMAT)
@@ -313,7 +362,7 @@ def onJoinClient(members: list, address: tuple, name: str):
         members.append(curMember)
     finally:
         threading.Lock(members).release()
-        
+
     print(f'Client {name} joined chat')
 
     return curMember

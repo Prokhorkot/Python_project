@@ -28,11 +28,11 @@ SYMM_KEY = '__SYMMKEY'
 R_SYMM_KEY = '__RECIEVE_SYMMKEY'
 LOGIN = '__LOGIN'
 
-# Special commands for client 
+# Special commands for client
 EXIT_COMM = '//exit'
 BEGIN_TO_CHAT_COMM = '//start_chat'
 
-# URL of Authentification server
+# URL of Authentication server
 AUTH_BASE = 'https://192.168.1.37:5000/'
 
 # SPECIAL USERNAMES
@@ -40,7 +40,7 @@ SERVER_USERNAME = 'SERVER'
 AUTH_USERNAME = 'AUTH_SERVER'
 
 
-vars = {'currentInterlocutor' : ''}
+vars = {'currentInterlocutor': ''}
 
 keys = {}
 
@@ -60,15 +60,16 @@ def connect(host: str = '192.168.1.37', port: int = 3030):
     loginToServer(server, name, token)
 
     startWorking(server)
-    
+
 
 def authorize():
     response = requests.get(AUTH_BASE + 'publickey', verify=False)
 
     publicKeyString = json.loads(response.text)['public key']
-    publicKey = encryption_asymmetric.getBytesOfStringPublicKey(publicKeyString)
+    publicKey = encryption_asymmetric.\
+        getBytesOfStringPublicKey(publicKeyString)
 
-    parametres = {
+    parameters = {
         'username': '',
         'password': '',
         'symmetricKey': ''}
@@ -87,14 +88,14 @@ def authorize():
                 key = token_bytes(16)
                 keys[AUTH_USERNAME] = key
 
-                parametres['username'] = publicEncryptSToS(username, publicKey)
-                parametres['password'] = publicEncryptSToS(password, publicKey)
-                parametres['symmetricKey'] = publicEncryptBToS(key, publicKey)
+                parameters['username'] = publicEncryptSToS(username, publicKey)
+                parameters['password'] = publicEncryptSToS(password, publicKey)
+                parameters['symmetricKey'] = publicEncryptBToS(key, publicKey)
 
+                response = requests.get(AUTH_BASE + 'accounts',
+                                        parameters, verify=False)
 
-                response = requests.get(AUTH_BASE + 'accounts', parametres, verify=False)
-
-                if response.status_code != 200: 
+                if response.status_code != 200:
                     os.system('cls')
                     print('Wrong username or password')
                     continue
@@ -122,14 +123,14 @@ def authorize():
                 key = token_bytes(16)
                 keys[AUTH_USERNAME] = key
 
-                parametres['username'] = publicEncryptSToS(username, publicKey)
-                parametres['password'] = publicEncryptSToS(password, publicKey)
-                parametres['symmetricKey'] = publicEncryptBToS(key, publicKey)
+                parameters['username'] = publicEncryptSToS(username, publicKey)
+                parameters['password'] = publicEncryptSToS(password, publicKey)
+                parameters['symmetricKey'] = publicEncryptBToS(key, publicKey)
 
+                response = requests.post(AUTH_BASE + 'accounts',
+                                         parameters, verify=False)
 
-                response = requests.post(AUTH_BASE + 'accounts', parametres, verify=False)
-
-                if response.status_code != 201: 
+                if response.status_code != 201:
                     os.system('cls')
                     print('User already exists!')
                     continue
@@ -170,7 +171,7 @@ def loginToServer(server: socket.socket, name, token):
         serverName = recieveMessage(server)
 
         answer = decryptMessage(server, SERVER_USERNAME)
-        
+
         if answer == 'Connected successfully!':
             print('Logged in')
             break
@@ -179,20 +180,14 @@ def loginToServer(server: socket.socket, name, token):
         name, token = authorize()
         continue
 
+
 def startWorking(server: socket.socket):
     threading.Thread(target=listen, args=(server,), daemon=False).start()
 
     os.system('cls')
 
     startChat(server)
-    # print(f'Commands:\n{EXIT_COMM} - to exit from current menu\n{BEGIN_TO_CHAT_COMM} - to start chat with someone\n')
-    # command = input()
-    # if command == EXIT_COMM:
-    #     return
-    
-    # if command == BEGIN_TO_CHAT_COMM:
-    #     startChat(server)
-        
+
 
 def startChat(server: socket.socket):
     os.system('cls')
@@ -225,7 +220,11 @@ def listen(server: socket.socket):
     while True:
         recieveCommand(server)
 
-def sendMessage(server: socket.socket, command: str, header: str, message: str = '', endPoint: str = ''):
+
+def sendMessage(server: socket.socket,
+                command: str, header: str,
+                message: str = '',
+                endPoint: str = ''):
     decrypter = header
 
     if endPoint != '':
@@ -261,7 +260,7 @@ def sendStrPacket(server: socket.socket, content: str):
     server.send(content)
 
 
-def sendBytePacket(server:socket.socket, content: bytes):
+def sendBytePacket(server: socket.socket, content: bytes):
     msgLenght = len(content)
     sendLength = str(msgLenght).encode(FORMAT)
     sendLength += b' ' * (HEADER - len(sendLength))
@@ -273,34 +272,36 @@ def sendBytePacket(server:socket.socket, content: bytes):
 def recieveMessage(server: socket.socket) -> str:
     while True:
         msgLength = server.recv(HEADER).decode(FORMAT)
-        if not msgLength: continue
+        if not msgLength:
+            continue
 
         msgLength = int(msgLength)
         message = server.recv(msgLength).decode(FORMAT)
 
         # print(f'{msgLength}: {message}')
-        
+
         return message
 
-def recieveCommand(server:socket.socket) -> int:
+
+def recieveCommand(server: socket.socket) -> int:
     command = recieveMessage(server)
 
     if command == START_CHAT:
         return onStartChat(server)
     if command == SEND_MESSAGE:
         recieveChatMessage(server)
-        return 
+        return
     if command == SYMM_KEY:
         onSendKey(server)
-        return 
+        return
     if command == PUBLIC_KEY:
         onSendPublicKey(server)
-        return 
+        return
     if command == R_SYMM_KEY:
         recieveSymmKey(server)
         return
     if command == UNKNOWN:
-        return 
+        return
 
 
 def onSendPublicKey(server: socket.socket):
@@ -324,7 +325,7 @@ def recieveSymmKey(server: socket.socket):
     keys[sender] = key
 
 
-def sendPublicKey(server:socket.socket, reciever: str, key: str):
+def sendPublicKey(server: socket.socket, reciever: str, key: str):
     sendStrPacket(server, PUBLIC_KEY)
     sendStrPacket(server, reciever)
     sendStrPacket(server, key)
@@ -346,8 +347,8 @@ def onSendKey(server: socket.socket):
         threading.Thread(target=listen, args=(server,), daemon=False).start()
         doChating(server, name)
 
-    
-def sendSymmKey(server:socket.socket, reciever: str, key: str):
+
+def sendSymmKey(server: socket.socket, reciever: str, key: str):
     sendStrPacket(server, SYMM_KEY)
     sendStrPacket(server, reciever)
     sendStrPacket(server, key)
@@ -368,6 +369,7 @@ def onStartChat(server: socket.socket) -> int:
     sendMessage(server, START_CHAT, reciever, endPoint=SERVER_USERNAME)
     return
 
+
 def recieveChatMessage(server: socket.socket) -> int:
     sender = recieveMessage(server)
     message = decryptMessage(server, sender)
@@ -378,16 +380,18 @@ def recieveChatMessage(server: socket.socket) -> int:
         print(f'\r\033[K\033[32m@{sender}: \033[37m{message}', end='\nyou:')
     return 0
 
+
 def onSetName() -> str:
     while True:
         name = input('Enter name: @')
 
-        if len(name) > 3 and re.fullmatch(r'.*\W.*', name) == None:
+        if len(name) > 3 and re.fullmatch(r'.*\W.*', name) is None:
             return name
 
         print('\r\033[K!!!Invalid name. Please, try another one!!!')
 
-def decryptMessage(server: socket.socket, name:str):
+
+def decryptMessage(server: socket.socket, name: str):
     nonce = recieveMessage(server)
     encMessage = recieveMessage(server)
     tag = recieveMessage(server)
@@ -404,6 +408,7 @@ def decryptMessage(server: socket.socket, name:str):
     )
 
     return bytes_and_strings.bytesToString(message)
+
 
 if __name__ == '__main__':
     os.system('cls')

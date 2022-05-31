@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 id = 1
 
+
 def mkdir(file: str):
     if not os.path.exists(file):
         os.mkdir(file)
@@ -23,6 +24,7 @@ session_recieved = Session(bind=engine_recieved)
 session_sent = Session(bind=engine_sent)
 session_keys = Session(bind=engine_key)
 
+
 class RecievedMessage(Base_recieved):
     __tablename__ = 'recieved_messages'
     id = Column(Integer, primary_key=True)
@@ -36,12 +38,12 @@ class SentMessage(Base_sent):
     reciever = Column(String)
     message = Column(String)
 
+
 class Key(Base_keys):
     __tablename__ = 'keys'
     id = Column(Integer, primary_key=True)
     username = Column(String)
     key = Column(String)
-
 
 
 def addRecievedMessage(sender, message):
@@ -63,7 +65,7 @@ def addKey(username, key):
 
     session_keys.add(key)
     session_keys.commit()
-    
+
 
 Base_recieved.metadata.create_all(engine_recieved)
 Base_sent.metadata.create_all(engine_sent)
