@@ -1,27 +1,27 @@
-aniso8601==9.0.1
-certifi==2021.10.8
-cffi==1.15.0
-charset-normalizer==2.0.12
-click==8.1.3
-cryptography==37.0.2
-Flask==2.1.2
-Flask-Login==0.6.1
-Flask-RESTful==0.3.9
-Flask-SQLAlchemy==2.5.1
-greenlet==1.1.2
-idna==3.3
-importlib-metadata==4.11.3
-itsdangerous==2.1.2
-Jinja2==3.1.2
-MarkupSafe==2.1.1
-pyasn1==0.4.8
-pycparser==2.21
-pycryptodome==3.14.1
-pyOpenSSL==22.0.0
-pytz==2022.1
-requests==2.27.1
-six==1.16.0
-SQLAlchemy==1.4.36
-urllib3==1.26.9
-Werkzeug==2.1.2
-zipp==3.8.0
+pip install aniso8601==9.0.1
+pip install certifi==2021.10.8
+pip install cffi==1.15.0
+pip install charset-normalizer==2.0.12
+pip install click==8.1.3
+pip install cryptography==37.0.2
+pip install Flask==2.1.2
+pip install Flask-Login==0.6.1
+pip install Flask-RESTful==0.3.9
+pip install Flask-SQLAlchemy==2.5.1
+pip install greenlet==1.1.2
+pip install idna==3.3
+pip install importlib-metadata==4.11.3
+pip install itsdangerous==2.1.2
+pip install Jinja2==3.1.2
+pip install MarkupSafe==2.1.1
+pip install pyasn1==0.4.8
+pip install pycparser==2.21
+pip install pycryptodome==3.14.1
+pip install pyOpenSSL==22.0.0
+pip install pytz==2022.1
+pip install requests==2.27.1
+pip install six==1.16.0
+pip install SQLAlchemy==1.4.36
+pip install urllib3==1.26.9
+pip install Werkzeug==2.1.2
+pip install zipp==3.8.0

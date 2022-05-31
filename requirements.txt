@@ -1,14 +1,14 @@
-certifi==2022.5.18.1
-cffi==1.15.0
-charset-normalizer==2.0.12
-cryptography==37.0.2
-greenlet==1.1.2
-idna==3.3
-Naked==0.1.31
-pycparser==2.21
-pycryptodome==3.14.1
-PyYAML==6.0
-requests==2.27.1
-shellescape==3.8.1
-SQLAlchemy==1.4.36
-urllib3==1.26.9
+pip install certifi==2022.5.18.1
+pip install cffi==1.15.0
+pip install charset-normalizer==2.0.12
+pip install cryptography==37.0.2
+pip install greenlet==1.1.2
+pip install idna==3.3
+pip install Naked==0.1.31
+pip install pycparser==2.21
+pip install pycryptodome==3.14.1
+pip install PyYAML==6.0
+pip install requests==2.27.1
+pip install shellescape==3.8.1
+pip install SQLAlchemy==1.4.36
+pip install urllib3==1.26.9

@@ -33,7 +33,7 @@ EXIT_COMM = '//exit'
 BEGIN_TO_CHAT_COMM = '//start_chat'
 
 # URL of Authentification server
-AUTH_BASE = 'https://127.0.0.1:5000/'
+AUTH_BASE = 'https://192.168.1.37:5000/'
 
 # SPECIAL USERNAMES
 SERVER_USERNAME = 'SERVER'
@@ -47,7 +47,7 @@ keys = {}
 encProfile = EncryptingProfile('client_keys')
 
 
-def connect(host: str = '127.0.0.1', port: int = 3030):
+def connect(host: str = '192.168.1.37', port: int = 3030):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect((host, port))
 
@@ -95,7 +95,7 @@ def authorize():
                 response = requests.get(AUTH_BASE + 'accounts', parametres, verify=False)
 
                 if response.status_code != 200: 
-                    os.system('clear')
+                    os.system('cls')
                     print('Wrong username or password')
                     continue
 
@@ -130,7 +130,7 @@ def authorize():
                 response = requests.post(AUTH_BASE + 'accounts', parametres, verify=False)
 
                 if response.status_code != 201: 
-                    os.system('clear')
+                    os.system('cls')
                     print('User already exists!')
                     continue
 
@@ -182,7 +182,7 @@ def loginToServer(server: socket.socket, name, token):
 def startWorking(server: socket.socket):
     threading.Thread(target=listen, args=(server,), daemon=False).start()
 
-    os.system('clear')
+    os.system('cls')
 
     startChat(server)
     # print(f'Commands:\n{EXIT_COMM} - to exit from current menu\n{BEGIN_TO_CHAT_COMM} - to start chat with someone\n')
@@ -195,7 +195,7 @@ def startWorking(server: socket.socket):
         
 
 def startChat(server: socket.socket):
-    os.system('clear')
+    os.system('cls')
 
     reciever = input('Please, enter reciever\'s name: ')
 
@@ -406,7 +406,7 @@ def decryptMessage(server: socket.socket, name:str):
     return bytes_and_strings.bytesToString(message)
 
 if __name__ == '__main__':
-    os.system('clear')
+    os.system('cls')
     print('Welcome to chat!')
     try:
         connect()

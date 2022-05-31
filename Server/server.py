@@ -25,7 +25,7 @@ START_CHAT = '__STARTCHAT'
 SEND_MESSAGE = '__SEND'
 PUBLIC_KEY = '__PUBKEY'
 SYMM_KEY = '__SYMMKEY'
-AUTH_BASE = 'https://127.0.0.1:5000/'
+AUTH_BASE = 'https://192.168.1.37:5000/'
 R_SYMM_KEY = '__RECIEVE_SYMMKEY'
 LOGIN = '__LOGIN'
 
@@ -45,7 +45,7 @@ def closeSocket():
             closed = True
 
 
-def startServer(host: str = '127.0.0.1', port: int = 3030):
+def startServer(host: str = '192.168.1.37', port: int = 3030):
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
@@ -320,7 +320,7 @@ def onJoinClient(members: list, address: tuple, name: str):
 
 
 if __name__ == '__main__':
-    os.system('clear')
+    os.system('cls')
     try:
         startServer()
     except:
