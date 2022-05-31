@@ -1,5 +1,4 @@
 import json
-from tokenize import String
 import requests
 import os
 import urllib3

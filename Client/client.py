@@ -52,9 +52,6 @@ def connect(host: str = '192.168.1.37', port: int = 3030):
     server.connect((host, port))
 
     name, token = authorize()
-    print(name)
-    print(token)
-
     recieveCommand(server)
 
     loginToServer(server, name, token)
